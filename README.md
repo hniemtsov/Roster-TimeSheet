@@ -3,7 +3,7 @@ Fortnight roster, timesheet
 
 This is web application have built on MVC5 framework in back end and such tools like bootstrap library, jQuery lib, multiselect from davidstutz, datatimepicker from Eonasdan in front end of it.
 
-The application intends to help in compiling staff schedule of an enterprise by fortnight and has next features:
+The application intends to help in compiling staff schedule of an enterprise by fortnight and has next features: <br/>
 1) Set up workers, shifts, roles(positions)
 2) assign workers to role and shifts to role.
 3) draw time sheet according to staff schedule.
