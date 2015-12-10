@@ -1,0 +1,157 @@
+﻿@using RestHomes.Domain.Entities;
+@model RestHomes.Models.RosterModel
+@{
+    ViewBag.Title = "Roster";
+}
+<style>
+  .role {background-color : #FF70B8}
+</style>
+
+<ul id="myTabs" class="nav nav-tabs">
+  <li role="presentation"  class="active">@Html.ActionLink("Roster", "List")</li>
+  <li role="presentation" class="dropdown">
+      <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop1-contents">Positions<span class="caret"></span></a>
+        <ul class="dropdown-menu" aria-labelledby="myTabDrop1" id="myTabDrop1-contents">
+          <li>@Html.ActionLink("Workers to Position", "ListWorkers", "Position", null, new { @role="tab" })</li>
+          <li>@Html.ActionLink("Shifts to Position", "ListShifts", "Position", null, new { @role="tab" })</li>
+        </ul>
+  </li>
+  <li role="presentation">@Html.ActionLink("Shifts", "List","Shift")</li>
+  <li role="presentation">@Html.ActionLink("Workers", "List", "Worker")</li>
+  <li role="presentation">@Html.ActionLink("TimeSheet", "List", "TimeSheet")</li>
+</ul> 
+<div class="row">
+    <!--div class="col-md-10">
+      <h1>Roster</h1>
+    <div -->
+    <div class='col-md-offset-10 col-md-2'>
+      <div class="form-group">
+        <div class='input-group date' id='dtp'>
+            @using (Html.BeginForm("SetDate", "Roster", FormMethod.Post, new { @id = "dateform" }))
+            {
+                <input name="startdate" type='text' class="form-control"/>
+            }
+
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.Hidden("dtFirst", Model.days.ElementAt(0))
+<table class="table table-condensed table-bordered">
+    <tr>
+        <th colspan="2"></th>
+        @foreach (var day in Model.days)
+        {
+        <th>
+            @day.ToString("ddd")
+        </th>
+        }
+    </tr>
+    <tr>
+        <td>SHIFT</td>
+        <td>Hrs</td>
+        @foreach (var day in Model.days)
+        {
+        <td>
+            @day.ToString("dd-MMM")
+        </td>
+        }
+    </tr>
+@{int k = 0;}
+@foreach (var pos in Model.positions)
+{
+    <tr>
+        <td colspan="16" class="role" style="text-align:left">
+            @if (ViewBag.AllowEdit == true)
+            { 
+                @Html.ActionLink(pos.position.Name, "Workers2Position", "Position", new { pos.position.IDp, returnUrl = Request.Url.PathAndQuery }, null)
+            }
+            else
+            {
+                @pos.position.Name
+            }
+        </td>
+    </tr>
+            foreach (var sh in pos.shifts)
+            {
+            <tr>
+                <td style="vertical-align:middle;text-align:center">
+                    @Html.Hidden("wbdfs[" + k + "].shiftID", sh.shift.IDs)
+                    @Html.Hidden("wbdfs[" + k + "].posID", pos.position.IDp)
+                    @(sh.shift.Start.Value.ToString(@"hh\:mm")) - @(sh.shift.End.Value.ToString(@"hh\:mm"))
+                </td>
+                <td style="vertical-align:middle;text-align:center">@sh.shift.Hours</td>
+                @for (int i = 0; i < sh.worker2days.Count(); i++)
+                {
+                    <td>
+                    @if (pos.position.Workers.Count() > 0)
+                    {
+                        List<SelectListItem> f = new List<SelectListItem>();
+                        IEnumerable<Worker> allWorkers = pos.position.Workers.Union(sh.worker2days.ElementAt(i));
+                        IEnumerable<Worker> sigWorkers = sh.worker2days.ElementAt(i).Where(w => !pos.position.Workers.Any(posW => posW.IDw == w.IDw));
+
+                        f.AddRange(allWorkers.Select(tz => new SelectListItem
+                        {
+                            Text = tz.NickName,
+                            Disabled = sigWorkers.Any(w => w.IDw == tz.IDw),
+                            Value = tz.IDw.ToString(),
+                            Selected = sh.worker2days.ElementAt(i).Any(w => w.IDw == tz.IDw)
+                        }));
+                       @Html.DropDownList("wbdfs[" + k + "].day" + "_" + i, f, new { @class = "workers-select form-control input-sm span", @multiple = "multiple" })            
+                    }
+                    else
+                    {
+                        foreach(var wrkr in sh.worker2days.ElementAt(i))
+                        {
+                            @wrkr.NickName<br />
+                        }
+                    }
+                    </td>
+                }
+            </tr>
+                k = k + 1;
+            }
+}
+</table>
+    <!--select class="workers-select" multiple="multiple">
+<option value="cheese">Cheese</option>
+    <option disabled="disabled" selected="selected" value="tomatoes">Tomatoes</option>
+    <option disabled="disabled" selected="selected" value="mozarella">Mozzarella</option>
+    <option value="mushrooms">Mushrooms</option>
+    <option value="pepperoni">Pepperoni</option>
+    <option value="onions">Onions</option>
+</select-->
+    <input type="submit" value="Save" />
+}
+@section scripts
+{
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($('.workers-select').length > 0) {
+            $('.workers-select').multiselect({
+                enableHTML: true,
+                numberDisplayed: 10,
+                delimiterText: '<br> ',
+                nonSelectedText: '....'
+            });
+        }
+        
+        $('#dtp').datetimepicker({
+            defaultDate: "@Model.days.ElementAt(0).ToString("MM/dd/yyyy")",
+            format: 'MM/DD/YYYY',
+            daysOfWeekDisabled: [0, 2, 3, 4, 5, 6]
+        });
+        $("#dtp").on("dp.change", function (e) {
+            $("form#dateform").submit();
+        });
+    });
+</script>	
+    }
+
+

@@ -1,0 +1,59 @@
+﻿@using RestHomes.Domain.Entities;
+@model IEnumerable<Position>
+
+@{ ViewBag.Title = "Positions"; }
+
+<ul id="myTabs" class="nav nav-tabs">
+  <li role="presentation" >@Html.ActionLink("Roster", "List", "Roster")</li>
+  <li role="presentation" class="active dropdown">
+      <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop1-contents">Positions<span class="caret"></span></a>
+        <ul class="dropdown-menu" aria-labelledby="myTabDrop1" id="myTabDrop1-contents">
+          <li class="active">@Html.ActionLink("Workers to Position", "ListWorkers", "Position", null, new { @role="tab"})</li>
+          <li>@Html.ActionLink("Shifts to Position", "ListShifts", "Position", null, new { @role="tab" })</li>
+        </ul>
+  </li>
+  <li role="presentation">@Html.ActionLink("Shifts", "List","Shift")</li>
+  <li role="presentation">@Html.ActionLink("Workers", "List", "Worker")</li>
+  <li role="presentation">@Html.ActionLink("TimeSheet", "List", "TimeSheet")</li>
+</ul>
+
+<h1>Positions</h1>
+<div class="panel panel-primary">
+   <div class="panel-heading">Positions</div>
+   <table class="table table-striped">
+      <tr><th>ID</th><th>Name</th><th class="text-center">Workers</th><th></th></tr>
+@if (Model.Count() == 0) 
+{
+    <tr><td colspan="4" class="text-center">No Roles</td></tr>
+} else {
+    foreach (Position role in Model)
+    {
+    <tr>
+        <td>@role.IDp</td>
+        <td>@role.Name</td>
+        <td class="text-center">
+        @if (role.Workers == null || role.Workers.Count == 0) 
+        {
+           @: No Workers in Position
+        } else {
+        <p>@string.Join(", ", role.Workers.Select(x => x.NickName))</p>
+        }
+        </td>
+        <td class="text-right">
+        @using (Html.BeginForm("Delete", "Position")) 
+        {
+            @*@Html.ActionLink("Edit", "Position", "Roster", new { idp = role.IDp, returnUrl = Request.Url.PathAndQuery },new { @class = "btn btn-primary btn-xs" })*@
+            @Html.ActionLink("Edit", "Workers2Position", new { role.IDp, returnUrl = Request.Url.PathAndQuery },new { @class = "btn btn-primary btn-xs" })
+            @Html.Hidden("returnUrl", Request.Url.PathAndQuery)
+            @Html.Hidden("posId", role.IDp)
+            <button class="btn btn-danger btn-xs" type="submit">Delete</button>
+        }
+        </td>
+    </tr>
+    }
+}
+    </table>
+</div>
+@Html.ActionLink("Create", "Create", null, new { @class = "btn btn-primary" })
+
+

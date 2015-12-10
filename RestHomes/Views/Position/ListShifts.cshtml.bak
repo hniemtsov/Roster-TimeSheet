@@ -1,0 +1,45 @@
+﻿@using RestHomes.Domain.Entities
+@model IEnumerable<IGrouping<Position,Shift>>
+
+@{ ViewBag.Title = "Positions"; }
+
+<div class="panel panel-primary">
+   <div class="panel-heading">Positions</div>
+   <table class="table table-striped">
+      <tr><th>ID</th><th>Name</th><th>Workers</th><th></th></tr>
+@if (Model.Count() == 0) 
+{
+    <tr><td colspan="4" class="text-center">No Roles</td></tr>
+} else {
+    foreach (IGrouping<Position,Shift> shift in Model)
+    {
+    <tr>
+        <td>@shift.Key.IDp</td>
+        <td>@role.Name</td>
+        <td>
+        @if (role.Workers == null || role.Workers.Count == 0) 
+        {
+           @: No Workers in Position
+        } else {
+        <p>@string.Join(", ", role.Workers.Select(x => x.NickName))</p>
+        }
+        </td>
+        <td>
+        @using (Html.BeginForm("Delete", "RoleAdmin",new { id = role.IDp })) 
+        {
+            @*@Html.ActionLink("Edit", "Position", "Roster", new { idp = role.IDp, returnUrl = Request.Url.PathAndQuery },new { @class = "btn btn-primary btn-xs" })*@
+            @Html.ActionLink("Edit", "Workers", new { role.IDp, returnUrl = Request.Url.PathAndQuery },new { @class = "btn btn-primary btn-xs" })
+            @Html.Hidden("returnUrl", Request.Url.PathAndQuery)
+
+                <button class="btn btn-danger btn-xs" type="submit">Delete</button>
+        }
+        </td>
+    </tr>
+    }
+}
+    </table>
+</div>
+@Html.ActionLink("Create", "Create", null, new { @class = "btn btn-primary" })
+
+
+

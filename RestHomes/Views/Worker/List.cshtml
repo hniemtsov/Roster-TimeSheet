@@ -1,0 +1,90 @@
+﻿@model IEnumerable<RestHomes.Domain.Entities.Worker>
+
+@{
+    ViewBag.Title = "List";
+}
+<ul id="myTabs" class="nav nav-tabs">
+  <li role="presentation" >@Html.ActionLink("Roster", "List", "Roster")</li>
+  <li role="presentation" class="dropdown">
+      <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown" aria-controls="myTabDrop1-contents">Positions<span class="caret"></span></a>
+        <ul class="dropdown-menu" aria-labelledby="myTabDrop1" id="myTabDrop1-contents">
+          <li>@Html.ActionLink("Workers to Position", "ListWorkers", "Position", null, new { @role="tab"})</li>
+          <li>@Html.ActionLink("Shifts to Position", "ListShifts", "Position", null, new { @role="tab" })</li>
+        </ul>
+  </li>
+  <li role="presentation">@Html.ActionLink("Shifts", "List", "Shift")</li>
+  <li role="presentation" class="active">@Html.ActionLink("Workers", "List")</li>
+  <li role="presentation">@Html.ActionLink("TimeSheet", "List", "TimeSheet")</li>
+</ul>
+
+<h2>Workers</h2>
+<div class="panel panel-primary">
+  <div class="panel-heading">Workers</div>
+  <table class="table table-striped">
+    <tr>
+      <th>
+        ID
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.FirstName)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.SecondName)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.NickName)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.SickHours)
+      </th>
+      <th>
+        @Html.DisplayNameFor(model => model.LeaveHours)
+      </th>
+      <th class="text-center">
+        Positions
+      </th>
+      <th></th>
+    </tr>
+@foreach (var worker in Model) {
+    <tr>
+      <td>
+        @Html.DisplayFor(modelItem => worker.IDw)
+      </td>
+      <td>
+        @Html.DisplayFor(modelItem => worker.FirstName)
+      </td>
+      <td>
+        @Html.DisplayFor(modelItem => worker.SecondName)
+      </td>
+      <td>
+          @Html.DisplayFor(modelItem => worker.NickName)
+      </td>
+      <td>
+          @Html.DisplayFor(modelItem => worker.SickHours)
+      </td>
+      <td>
+          @Html.DisplayFor(modelItem => worker.LeaveHours)
+      </td>
+      <td class="text-center">
+        @if (worker.Positions == null || worker.Positions.Count == 0) 
+        {
+          @: No Positions have assigned to this worker
+        } else 
+        {
+          <p>@string.Join(", ", worker.Positions.Select(pos => pos.Name))</p>
+        }
+      </td>
+      <td class="text-right">
+        @using (Html.BeginForm("Delete", "Shift")) 
+        {
+            @Html.ActionLink("Edit", "Positions2Worker", new { worker.IDw, returnUrl = Request.Url.PathAndQuery },new { @class = "btn btn-primary btn-xs" })
+            @Html.Hidden("returnUrl", Request.Url.PathAndQuery)
+            @Html.Hidden("workerId", worker.IDw)
+            <button class="btn btn-danger btn-xs" type="submit">Delete</button>
+        }
+      </td>
+    </tr>
+    }
+  </table>
+</div>
+@Html.ActionLink("Create", "Create", null, new { @class = "btn btn-primary" })

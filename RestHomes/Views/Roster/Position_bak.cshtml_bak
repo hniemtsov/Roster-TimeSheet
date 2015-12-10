@@ -1,0 +1,75 @@
+﻿
+
+
+
+
+@model IEnumerable<RestHomes.Domain.Entities.Worker>
+
+@*@{
+    ViewBag.Title = "Position";
+}*@
+
+<h3>Position: @ViewBag.Title</h3>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@using (Html.BeginForm())
+{
+<table class="table">
+    <tr>
+        <th>
+
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SecondName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.NickName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SickHours)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LeaveHours)
+        </th>
+        <th></th>
+    </tr>
+@{int k = 0;}
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.Hidden("["+k+"].workerId", item.IDw)
+            @Html.CheckBox("["+k+"].isInPosition", item.Positions.Select(t=>(int)t.IDp).Contains((int)ViewBag.IDp))
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FirstName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SecondName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.NickName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SickHours)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LeaveHours)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.IDw }) |
+            @Html.ActionLink("Details", "Details", new { id=item.IDw }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.IDw })
+        </td>
+    </tr>
+    k = k + 1;
+}
+
+</table>
+    <button type="submit" class="btn btn-primary">Save</button>
+@Html.ActionLink("Cancel", "List", null, new { @class = "btn btn-default"})
+}

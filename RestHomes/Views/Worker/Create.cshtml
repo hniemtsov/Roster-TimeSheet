@@ -1,0 +1,61 @@
+﻿@model RestHomes.Models.CreateWorkerModel
+
+@{
+    ViewBag.Title = "Create Worker";
+}
+
+<h2>Create Worker</h2>
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.firstName, new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @Html.TextBoxFor(model => model.firstName, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.firstName)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.lastName, new { @class = "control-label col-md-2" })
+            <div class="col-md-5">
+                @Html.TextBoxFor(model => model.lastName, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.lastName)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.nickName, new { @class = "control-label col-md-2" })
+            <div class="col-md-2">
+                @Html.TextBoxFor(model => model.nickName, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.nickName)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.sickHours, new { @class = "control-label col-md-2" })
+            <div class="col-md-1">
+                @Html.TextBoxFor(model => model.sickHours, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.sickHours)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.leaveHours, new { @class = "control-label col-md-2" })
+            <div class="col-md-1">
+                @Html.TextBoxFor(model => model.leaveHours, new { @class = "form-control"})
+                @Html.ValidationMessageFor(model => model.leaveHours)
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-default">Create</button>
+        @Html.ActionLink("Cancel", "List", null, new { @class = "btn btn-primary"})
+
+    </div>
+}

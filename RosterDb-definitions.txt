@@ -1,0 +1,78 @@
+CREATE TABLE [dbo].[TimeSheet] (
+    [Day]      DATE       NOT NULL,
+    [IDw]      INT        NOT NULL,
+    [IDp]      INT        NOT NULL,
+    [IDs]      INT        NOT NULL,
+    [Hours]    FLOAT (53) NULL,
+    [isSigned] BIT        NULL,
+    CONSTRAINT [PK__TimeShee__C0301F13CB47E67B] PRIMARY KEY CLUSTERED ([Day] ASC, [IDw] ASC, [IDp] ASC, [IDs] ASC),
+    CONSTRAINT [FK_TimeSheet_Shifts] FOREIGN KEY ([IDs]) REFERENCES [dbo].[Shifts] ([IDs]),
+    CONSTRAINT [FK_TimeSheet_Positions] FOREIGN KEY ([IDp]) REFERENCES [dbo].[Positions] ([IDp]),
+    CONSTRAINT [FK_TimeSheet_Workers] FOREIGN KEY ([IDw]) REFERENCES [dbo].[Workers] ([IDw])
+);
+
+GO
+-- =============================================
+-- Author:		Hennadii Niemtsov
+-- Create date: 11/07/2015
+-- Description:	Prevent shift insertion from shifts are not belong the inserted worker 
+-- =============================================
+CREATE TRIGGER [dbo].[add_shifts] 
+   ON  [dbo].[TimeSheet] 
+   AFTER INSERT,UPDATE
+AS IF UPDATE(IDs)
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	IF (SELECT inserted.IDs FROM inserted WHERE inserted.IDs IN (select Shifts.IDs from Shifts where Shifts.IDs in (select SP.IDs from SP where SP.IDp in (select WP.IDp from WP where WP.IDw=inserted.IDw)))) Is NULL
+	BEGIN
+    -- Insert statements for trigger here
+		ROLLBACK TRANSACTION
+	END
+END
+
+CREATE TABLE [dbo].[Positions] (
+    [IDp]         INT           IDENTITY (1, 1) NOT NULL,
+    [Name]        NVARCHAR (50) NULL,
+    [Description] NVARCHAR (50) NULL,
+    [isDeleted]   BIT           NULL,
+    PRIMARY KEY CLUSTERED ([IDp] ASC)
+);
+
+CREATE TABLE [dbo].[Shifts] (
+    [IDs]       INT        IDENTITY (1, 1) NOT NULL,
+    [Start]     TIME (7)   NULL,
+    [End]       TIME (7)   NULL,
+    [Hours]     FLOAT (53) NULL,
+    [isDeleted] BIT        NULL,
+    PRIMARY KEY CLUSTERED ([IDs] ASC)
+);
+
+CREATE TABLE [dbo].[Workers] (
+    [IDw]        INT           IDENTITY (1, 1) NOT NULL,
+    [FirstName]  NVARCHAR (20) NULL,
+    [SecondName] NVARCHAR (20) NULL,
+    [NickName]   NVARCHAR (10) NULL,
+    [SickHours]  INT           NULL,
+    [LeaveHours] INT           NULL,
+    [isDeleted]  BIT           NULL,
+    PRIMARY KEY CLUSTERED ([IDw] ASC)
+);
+
+CREATE TABLE [dbo].[SP] (
+    [IDs] INT NOT NULL,
+    [IDp] INT NOT NULL,
+    CONSTRAINT [PK__SP__C4971C1B9ED39D8E] PRIMARY KEY CLUSTERED ([IDs] ASC, [IDp] ASC),
+    CONSTRAINT [FK_SP_Positions] FOREIGN KEY ([IDp]) REFERENCES [dbo].[Positions] ([IDp]),
+    CONSTRAINT [FK_SP_Shifts] FOREIGN KEY ([IDs]) REFERENCES [dbo].[Shifts] ([IDs])
+);
+
+CREATE TABLE [dbo].[WP] (
+    [IDw] INT NOT NULL,
+    [IDp] INT NOT NULL,
+    CONSTRAINT [PK__WP__C4971C67EBF98962] PRIMARY KEY CLUSTERED ([IDw] ASC, [IDp] ASC),
+    CONSTRAINT [FK_WP_Positions] FOREIGN KEY ([IDp]) REFERENCES [dbo].[Positions] ([IDp]),
+    CONSTRAINT [FK_WP_Workers] FOREIGN KEY ([IDw]) REFERENCES [dbo].[Workers] ([IDw])
+);
+
